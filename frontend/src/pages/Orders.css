@@ -1,0 +1,148 @@
+.orders-page {
+  padding: 40px 0;
+  min-height: calc(100vh - 70px);
+}
+
+.checkout-section {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.checkout-section h2 {
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.empty-orders {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.empty-orders p {
+  font-size: 20px;
+  margin-bottom: 30px;
+  color: #666;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-card {
+  padding: 30px;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.order-header h3 {
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.order-date {
+  color: #666;
+  font-size: 14px;
+}
+
+.order-status {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-end;
+}
+
+.status-paid,
+.status-delivered {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: #28a745;
+  color: white;
+}
+
+.status-unpaid {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: #ffc107;
+  color: #333;
+}
+
+.order-items {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.order-item {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.order-item-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.order-item-info h4 {
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.order-item-info p {
+  color: #666;
+  font-size: 14px;
+}
+
+.order-footer {
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.order-total {
+  text-align: right;
+  font-size: 20px;
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .order-header {
+    flex-direction: column;
+  }
+
+  .order-status {
+    align-items: flex-start;
+    margin-top: 10px;
+  }
+}
+
+
