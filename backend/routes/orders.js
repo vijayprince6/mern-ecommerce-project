@@ -7,7 +7,7 @@ const { auth, admin } = require('../middleware/auth');
 const router = express.Router();
 
 // @route   POST /api/orders
-// @desc    Create new order
+// @desc    Create new order (INFINITE STOCK MODE)
 // @access  Private
 router.post('/', auth, async (req, res) => {
   try {
@@ -23,15 +23,12 @@ router.post('/', auth, async (req, res) => {
       return res.status(400).json({ message: 'No order items' });
     }
 
-    // Calculate total price
+    // Calculate total price (NO STOCK CHECK)
     let totalPrice = 0;
     for (const item of orderItems) {
       const product = await Product.findById(item.product);
       if (!product) {
         return res.status(404).json({ message: `Product ${item.product} not found` });
-      }
-      if (product.stock < item.quantity) {
-        return res.status(400).json({ message: `Insufficient stock for ${product.name}` });
       }
       totalPrice += product.price * item.quantity;
     }
@@ -48,12 +45,8 @@ router.post('/', auth, async (req, res) => {
       totalPrice
     });
 
-    // Update product stock
-    for (const item of orderItems) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { stock: -item.quantity }
-      });
-    }
+    // ❌ REMOVED STOCK UPDATE (INFINITE MODE)
+    // No stock decrement, no insufficient stock
 
     // Save purchase info to User model
     const productNames = orderItems.map(item => item.name).join(', ');
@@ -86,6 +79,7 @@ router.get('/', auth, async (req, res) => {
       .populate('user', 'name email')
       .populate('orderItems.product', 'name image')
       .sort({ createdAt: -1 });
+
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -106,7 +100,10 @@ router.get('/:id', auth, async (req, res) => {
     }
 
     // Check if user owns the order or is admin
-    if (order.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    if (
+      order.user._id.toString() !== req.user._id.toString() &&
+      req.user.role !== 'admin'
+    ) {
       return res.status(403).json({ message: 'Access denied' });
     }
 
@@ -122,6 +119,7 @@ router.get('/:id', auth, async (req, res) => {
 router.put('/:id/pay', auth, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
+
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
@@ -143,6 +141,7 @@ router.put('/:id/pay', auth, async (req, res) => {
 router.put('/:id/deliver', auth, admin, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
+
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
