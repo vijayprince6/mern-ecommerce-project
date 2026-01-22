@@ -35,8 +35,7 @@ const Bats = () => {
         price: product.price,
         category: 'bats',
         brand: product.company,
-        image: product.img,
-        stock: 10
+        image: product.img
       };
 
       let productId = product._id;
@@ -45,12 +44,14 @@ const Bats = () => {
         productId = createResponse.data._id;
       }
 
+      // Add to cart (no stock checks - users can buy unlimited times)
       await axios.post(`${API_URL}/cart`, {
         productId,
         quantity: 1
       });
       // Refresh cart count in navbar
       refreshCartCount();
+      toast.success('Added to cart successfully!');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add to cart');
     }
@@ -65,10 +66,37 @@ const Bats = () => {
     }
 
     try {
-      await handleAddToCart(product);
-      navigate('/cart');
+      const productData = {
+        name: product.name,
+        description: `${product.name} by ${product.company}`,
+        price: product.price,
+        category: 'bats',
+        brand: product.company,
+        image: product.img
+      };
+
+      let productId = product._id;
+      if (!productId) {
+        const createResponse = await axios.post(`${API_URL}/products`, productData);
+        productId = createResponse.data._id;
+      }
+
+      // Add to cart (no stock checks - users can buy unlimited times)
+      await axios.post(`${API_URL}/cart`, {
+        productId,
+        quantity: 1
+      });
+      
+      // Refresh cart count in navbar
+      refreshCartCount();
+      toast.success('Added to cart! Redirecting to cart...');
+      
+      // Navigate to cart after a short delay
+      setTimeout(() => {
+        navigate('/cart');
+      }, 500);
     } catch (error) {
-      toast.error('Failed to add to cart');
+      toast.error(error.response?.data?.message || 'Failed to add to cart');
     }
   };
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Products from './pages/Products';
@@ -14,15 +15,17 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Orders from './pages/Orders';
+
 import { AuthProvider } from './context/AuthContext';
 import './App.css';
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router> {/* ✅ Only one Router here */}
         <div className="App">
           <Navbar />
+
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Home />} />
@@ -38,6 +41,7 @@ function App() {
               <Route path="/orders" element={<Orders />} />
             </Routes>
           </main>
+
           <ToastContainer
             position="top-right"
             autoClose={3000}
@@ -56,4 +60,3 @@ function App() {
 }
 
 export default App;
-

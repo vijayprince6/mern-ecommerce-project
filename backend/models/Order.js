@@ -1,87 +1,27 @@
-const mongoose = require('mongoose');
-
-const orderItemSchema = new mongoose.Schema({
-  product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-    required: true
-  },
-  name: {
-    type: String,
-    required: true
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 1
-  },
-  price: {
-    type: Number,
-    required: true
-  },
-  image: {
-    type: String
-  }
-});
+import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  orderItems: [
+    {
+      name: { type: String, required: true },
+      quantity: { type: Number, required: true },
+      price: { type: Number, required: true },
+      product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+      image: String
+    }
+  ],
+  shippingAddress: { 
+    street: String,
+    city: String,
+    state: String,
+    zipCode: String,
+    country: String
   },
-  orderItems: [orderItemSchema],
-  shippingAddress: {
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    zipCode: { type: String, required: true },
-    country: { type: String, required: true }
-  },
-  paymentMethod: {
-    type: String,
-    required: true,
-    enum: ['cash', 'card', 'paypal']
-  },
-  paymentResult: {
-    id: String,
-    status: String,
-    update_time: String,
-    email_address: String
-  },
-  taxPrice: {
-    type: Number,
-    required: true,
-    default: 0.0
-  },
-  shippingPrice: {
-    type: Number,
-    required: true,
-    default: 0.0
-  },
-  totalPrice: {
-    type: Number,
-    required: true,
-    default: 0.0
-  },
-  isPaid: {
-    type: Boolean,
-    default: false
-  },
-  paidAt: {
-    type: Date
-  },
-  isDelivered: {
-    type: Boolean,
-    default: false
-  },
-  deliveredAt: {
-    type: Date
-  }
-}, {
-  timestamps: true
-});
+  paymentMethod: { type: String, default: 'COD' },
+  totalPrice: { type: Number, required: true, default: 0 },
+  totalQuantity: { type: Number, default: 0 }, // Total number of items
+}, { timestamps: true });
 
-module.exports = mongoose.model('Order', orderSchema);
-
-
+const Order = mongoose.model('Order', orderSchema);
+export default Order;

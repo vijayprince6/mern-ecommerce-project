@@ -1,36 +1,45 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+// backend/middleware/auth.js
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
-const auth = async (req, res, next) => {
+export const auth = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    // Get token from headers
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+      return res.status(401).json({ message: 'No authorization header, please login first' });
+    }
 
+    const token = authHeader.split(' ')[1];
+    
     if (!token) {
-      return res.status(401).json({ message: 'No token provided, authorization denied' });
+      return res.status(401).json({ message: 'No token found, please login first' });
     }
 
-    const secret = process.env.JWT_SECRET || 'default_secret_key_change_in_production';
-    const decoded = jwt.verify(token, secret);
-    const user = await User.findById(decoded.id).select('-password');
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (!user) {
-      return res.status(401).json({ message: 'Token is not valid' });
+    if (!decoded || !decoded.id) {
+      return res.status(401).json({ message: 'Invalid token format' });
     }
 
-    req.user = user;
-    next();
-  } catch (error) {
-    res.status(401).json({ message: 'Token is not valid' });
+    // Attach user to request object (excluding password)
+    req.user = await User.findById(decoded.id).select('-password');
+
+    if (!req.user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    next(); // proceed to the next middleware/route handler
+  } catch (err) {
+    console.error('Auth error:', err);
+    if (err.name === 'JsonWebTokenError') {
+      return res.status(401).json({ message: 'Invalid token, please login again' });
+    }
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Token expired, please login again' });
+    }
+    res.status(401).json({ message: 'Authentication failed', error: err.message });
   }
 };
-
-const admin = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
-    next();
-  } else {
-    res.status(403).json({ message: 'Access denied. Admin only.' });
-  }
-};
-
-module.exports = { auth, admin };
-

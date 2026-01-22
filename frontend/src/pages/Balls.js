@@ -36,8 +36,7 @@ const Balls = () => {
         price: product.price,
         category: 'balls',
         brand: product.company,
-        image: product.img,
-        stock: 10
+        image: product.img
       };
 
       // Try to find existing product or create new one
@@ -48,13 +47,14 @@ const Balls = () => {
         productId = createResponse.data._id;
       }
 
-      // Add to cart
+      // Add to cart (no stock checks - users can buy unlimited times)
       await axios.post(`${API_URL}/cart`, {
         productId,
         quantity: 1
       });
       // Refresh cart count in navbar
       refreshCartCount();
+      toast.success('Added to cart successfully!');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add to cart');
     }
@@ -69,12 +69,40 @@ const Balls = () => {
     }
 
     try {
-      // Add to cart first
-      await handleAddToCart(product);
-      // Navigate to cart
-      navigate('/cart');
+      // First, check if product exists in database or create it
+      const productData = {
+        name: product.name,
+        description: `${product.name} by ${product.company}`,
+        price: product.price,
+        category: 'balls',
+        brand: product.company,
+        image: product.img
+      };
+
+      // Try to find existing product or create new one
+      let productId = product._id;
+      if (!productId) {
+        // Create product in database
+        const createResponse = await axios.post(`${API_URL}/products`, productData);
+        productId = createResponse.data._id;
+      }
+
+      // Add to cart (no stock checks - users can buy unlimited times)
+      await axios.post(`${API_URL}/cart`, {
+        productId,
+        quantity: 1
+      });
+      
+      // Refresh cart count in navbar
+      refreshCartCount();
+      toast.success('Added to cart! Redirecting to cart...');
+      
+      // Navigate to cart after a short delay
+      setTimeout(() => {
+        navigate('/cart');
+      }, 500);
     } catch (error) {
-      toast.error('Failed to add to cart');
+      toast.error(error.response?.data?.message || 'Failed to add to cart');
     }
   };
 

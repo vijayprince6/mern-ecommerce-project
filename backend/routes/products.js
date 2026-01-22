@@ -1,115 +1,76 @@
-const express = require('express');
-const Product = require('../models/Product');
-const { auth, admin } = require('../middleware/auth');
+import express from 'express';
+import Product from '../models/Product.js';
+import { auth } from '../middleware/auth.js'; // ✅ fixed
 
 const router = express.Router();
 
-// @route   GET /api/products
-// @desc    Get all products
-// @access  Public
+// Get all products
 router.get('/', async (req, res) => {
   try {
-    const { category, featured, search, page = 1, limit = 10 } = req.query;
-    const query = {};
-
-    if (category) query.category = category;
-    if (featured !== undefined) query.featured = featured === 'true';
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
-      ];
-    }
-
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-    const products = await Product.find(query)
-      .limit(parseInt(limit))
-      .skip(skip)
-      .sort({ createdAt: -1 });
-
-    const total = await Product.countDocuments(query);
-
-    res.json({
-      products,
-      page: parseInt(page),
-      pages: Math.ceil(total / parseInt(limit)),
-      total
-    });
+    const products = await Product.find();
+    res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// @route   GET /api/products/:id
-// @desc    Get single product
-// @access  Public
+// Get single product
 router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+    if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// @route   POST /api/products
-// @desc    Create a product
-// @access  Private/Admin (or public for initial setup)
-router.post('/', async (req, res) => {
+// Add product (allow authenticated users to create products)
+router.post('/', auth, async (req, res) => {
   try {
-    // Check if product already exists
+    // Check if product already exists by name and category
     const existingProduct = await Product.findOne({ 
       name: req.body.name,
       category: req.body.category 
     });
     
     if (existingProduct) {
+      // Return existing product
       return res.json(existingProduct);
     }
     
-    const product = await Product.create(req.body);
+    // Create new product if it doesn't exist
+    const product = new Product(req.body);
+    await product.save();
     res.status(201).json(product);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// @route   PUT /api/products/:id
-// @desc    Update a product
-// @access  Private/Admin
-router.put('/:id', auth, admin, async (req, res) => {
+// Update product (admin only)
+router.put('/:id', auth, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
   try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// @route   DELETE /api/products/:id
-// @desc    Delete a product
-// @access  Private/Admin
-router.delete('/:id', auth, admin, async (req, res) => {
+// Delete product (admin only)
+router.delete('/:id', auth, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+    if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-module.exports = router;
-
+export default router;
+  

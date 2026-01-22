@@ -11,17 +11,6 @@ const Orders = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [checkoutData, setCheckoutData] = useState({
-    shippingAddress: {
-      street: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      country: ''
-    },
-    paymentMethod: 'card'
-  });
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -33,58 +22,16 @@ const Orders = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`${API_URL}/cart`);
-      const cart = response.data;
-      
-      // If cart has items, show checkout
-      if (cart.items && cart.items.length > 0) {
-        setShowCheckout(true);
-      } else {
-        // Fetch existing orders
-        const ordersResponse = await axios.get(`${API_URL}/orders`);
-        setOrders(ordersResponse.data);
-      }
+      // Fetch existing orders (chronologically sorted by backend)
+      const ordersResponse = await axios.get(`${API_URL}/orders`);
+      setOrders(ordersResponse.data || []);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error fetching orders:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCheckout = async (e) => {
-    e.preventDefault();
-    try {
-      const cartResponse = await axios.get(`${API_URL}/cart`);
-      const cart = cartResponse.data;
-
-      const orderItems = cart.items.map(item => ({
-        product: item.product._id,
-        name: item.product.name,
-        quantity: item.quantity,
-        price: item.product.price,
-        image: item.product.image
-      }));
-
-      const orderData = {
-        orderItems,
-        shippingAddress: checkoutData.shippingAddress,
-        paymentMethod: checkoutData.paymentMethod,
-        taxPrice: 0,
-        shippingPrice: 10
-      };
-
-      await axios.post(`${API_URL}/orders`, orderData);
-      
-      // Clear cart
-      await axios.delete(`${API_URL}/cart`);
-      
-      setShowCheckout(false);
-      fetchOrders();
-      alert('Order placed successfully!');
-    } catch (error) {
-      alert(error.response?.data?.message || 'Failed to place order');
-    }
-  };
 
   if (!isAuthenticated) {
     return null;
@@ -103,187 +50,90 @@ const Orders = () => {
   return (
     <div className="orders-page">
       <div className="container">
-        <h1 className="page-title">Orders</h1>
+        <h1 className="page-title">Purchase History</h1>
 
-        {showCheckout ? (
-          <div className="checkout-section card">
-            <h2>Checkout</h2>
-            <form onSubmit={handleCheckout}>
-              <div className="form-group">
-                <label>Street Address</label>
-                <input
-                  type="text"
-                  required
-                  value={checkoutData.shippingAddress.street}
-                  onChange={(e) =>
-                    setCheckoutData({
-                      ...checkoutData,
-                      shippingAddress: {
-                        ...checkoutData.shippingAddress,
-                        street: e.target.value
-                      }
-                    })
-                  }
-                  className="form-control"
-                />
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>City</label>
-                  <input
-                    type="text"
-                    required
-                    value={checkoutData.shippingAddress.city}
-                    onChange={(e) =>
-                      setCheckoutData({
-                        ...checkoutData,
-                        shippingAddress: {
-                          ...checkoutData.shippingAddress,
-                          city: e.target.value
-                        }
-                      })
-                    }
-                    className="form-control"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>State</label>
-                  <input
-                    type="text"
-                    required
-                    value={checkoutData.shippingAddress.state}
-                    onChange={(e) =>
-                      setCheckoutData({
-                        ...checkoutData,
-                        shippingAddress: {
-                          ...checkoutData.shippingAddress,
-                          state: e.target.value
-                        }
-                      })
-                    }
-                    className="form-control"
-                  />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Zip Code</label>
-                  <input
-                    type="text"
-                    required
-                    value={checkoutData.shippingAddress.zipCode}
-                    onChange={(e) =>
-                      setCheckoutData({
-                        ...checkoutData,
-                        shippingAddress: {
-                          ...checkoutData.shippingAddress,
-                          zipCode: e.target.value
-                        }
-                      })
-                    }
-                    className="form-control"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Country</label>
-                  <input
-                    type="text"
-                    required
-                    value={checkoutData.shippingAddress.country}
-                    onChange={(e) =>
-                      setCheckoutData({
-                        ...checkoutData,
-                        shippingAddress: {
-                          ...checkoutData.shippingAddress,
-                          country: e.target.value
-                        }
-                      })
-                    }
-                    className="form-control"
-                  />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Payment Method</label>
-                <select
-                  value={checkoutData.paymentMethod}
-                  onChange={(e) =>
-                    setCheckoutData({
-                      ...checkoutData,
-                      paymentMethod: e.target.value
-                    })
-                  }
-                  className="form-control"
-                >
-                  <option value="card">Credit/Debit Card</option>
-                  <option value="cash">Cash on Delivery</option>
-                  <option value="paypal">PayPal</option>
-                </select>
-              </div>
-              <button type="submit" className="btn btn-primary btn-block">
-                Place Order
-              </button>
-            </form>
+        {orders.length === 0 ? (
+          <div className="empty-orders">
+            <p>You have no purchase history yet</p>
+            <Link to="/" className="btn btn-primary">
+              Start Shopping
+            </Link>
           </div>
         ) : (
-          <>
-            {orders.length === 0 ? (
-              <div className="empty-orders">
-                <p>You have no orders yet</p>
-                <Link to="/products" className="btn btn-primary">
-                  Start Shopping
-                </Link>
-              </div>
-            ) : (
-              <div className="orders-list">
-                {orders.map((order) => (
-                  <div key={order._id} className="order-card card">
-                    <div className="order-header">
-                      <div>
-                        <h3>Order #{order._id.slice(-6)}</h3>
-                        <p className="order-date">
-                          {new Date(order.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="order-status">
-                        {order.isPaid ? (
-                          <span className="status-paid">Paid</span>
-                        ) : (
-                          <span className="status-unpaid">Unpaid</span>
-                        )}
-                        {order.isDelivered && (
-                          <span className="status-delivered">Delivered</span>
-                        )}
-                      </div>
+          <div className="orders-list">
+            {orders.map((order, orderIndex) => {
+              const orderDate = new Date(order.createdAt);
+              const formattedDate = orderDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+
+              return (
+                <div key={order._id} className="order-card card">
+                  <div className="order-header">
+                    <div>
+                      <h3>Purchase #{orders.length - orderIndex}</h3>
+                      <p className="order-date">
+                        <strong>Date:</strong> {formattedDate}
+                      </p>
+                      <p className="order-id">
+                        <strong>Order ID:</strong> {order._id.slice(-8).toUpperCase()}
+                      </p>
                     </div>
-                    <div className="order-items">
-                      {order.orderItems.map((item, index) => (
-                        <div key={index} className="order-item">
+                    <div className="order-status">
+                      <span className="status-badge">Completed</span>
+                    </div>
+                  </div>
+                  
+                  <div className="order-items">
+                    <h4>Products Purchased:</h4>
+                    {order.orderItems && order.orderItems.map((item, itemIndex) => {
+                      const product = item.product || {};
+                      const itemName = item.name || product.name || 'Product';
+                      const itemPrice = item.price || product.price || 0;
+                      const itemQuantity = item.quantity || 1;
+                      const itemImage = item.image || product.image || 'https://via.placeholder.com/80';
+                      const itemTotal = itemPrice * itemQuantity;
+
+                      return (
+                        <div key={itemIndex} className="order-item">
                           <img
-                            src={item.image || 'https://via.placeholder.com/80'}
-                            alt={item.name}
+                            src={itemImage}
+                            alt={itemName}
                             className="order-item-image"
+                            onError={(e) => {
+                              e.target.src = 'https://via.placeholder.com/80';
+                            }}
                           />
                           <div className="order-item-info">
-                            <h4>{item.name}</h4>
-                            <p>
-                              {item.quantity} x ${item.price} = $
-                              {(item.quantity * item.price).toFixed(2)}
+                            <h4>{itemName}</h4>
+                            <p className="order-item-details">
+                              <strong>Quantity:</strong> {itemQuantity} | 
+                              <strong> Price per unit:</strong> ₹{itemPrice.toFixed(2)} | 
+                              <strong> Subtotal:</strong> ₹{itemTotal.toFixed(2)}
                             </p>
                           </div>
                         </div>
-                      ))}
+                      );
+                    })}
+                  </div>
+                  
+                  <div className="order-footer">
+                    <div className="order-summary">
+                      <p><strong>Total Items:</strong> {order.totalQuantity || order.orderItems.reduce((sum, item) => sum + (item.quantity || 1), 0)}</p>
+                      <p><strong>Payment Method:</strong> {order.paymentMethod || 'COD'}</p>
                     </div>
-                    <div className="order-footer">
-                      <div className="order-total">
-                        <strong>Total: ${order.totalPrice.toFixed(2)}</strong>
-                      </div>
+                    <div className="order-total">
+                      <strong>Total Amount: ₹{order.totalPrice?.toFixed(2) || '0.00'}</strong>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>

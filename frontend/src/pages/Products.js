@@ -1,324 +1,107 @@
-// src/Products.js
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './Products.css';
+import { toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
+import './ProductDetail.css';
 
-// Use environment variable or fallback to localhost
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-const Products = () => {
-  const [products, setProducts] = useState([]);
+const ProductDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [categories, setCategories] = useState([]);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-  }, [search, category, page]);
+    fetchProduct();
+  }, [id]);
 
-  const fetchProducts = async () => {
-    setLoading(true);
+  const fetchProduct = async () => {
     try {
-      const params = {
-        page,
-        limit: 12,
-        ...(search && { search }),
-        ...(category && { category })
-      };
-      const response = await axios.get(`${API_URL}/products`, { params });
-      setProducts(response.data.products);
-      setTotalPages(response.data.pages);
+      const response = await axios.get(`${API_URL}/products/${id}`);
+      setProduct(response.data);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      toast.error('Product not found');
+      navigate('/products');
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchCategories = async () => {
+  const addToCart = async () => {
+    if (!isAuthenticated) {
+      if (window.confirm('Please Login/Sign up first. Click OK to go to login page.')) {
+        navigate('/login');
+      }
+      return;
+    }
+
     try {
-      const response = await axios.get(`${API_URL}/products`);
-      const allProducts = response.data.products;
-      const uniqueCategories = [...new Set(allProducts.map(p => p.category))];
-      setCategories(uniqueCategories);
+      await axios.post(`${API_URL}/cart`, {
+        productId: id,
+        quantity
+      });
+      window.dispatchEvent(new Event('cartUpdated'));
+      toast.success('Added to cart!');
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      toast.error(error.response?.data?.message || 'Failed to add to cart');
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setPage(1);
-    fetchProducts();
-  };
+  if (loading) return <div className="spinner"></div>;
+  if (!product) return null;
 
   return (
-    <div className="products-page">
+    <div className="product-detail-page">
       <div className="container">
-        <h1 className="page-title">Products</h1>
+        <div className="product-detail">
+          <div className="product-detail-image">
+            <img src={product.image || 'https://via.placeholder.com/500'} alt={product.name} />
+          </div>
+          <div className="product-detail-info">
+            <h1>{product.name}</h1>
+            <p className="product-category">{product.category}</p>
+            <p className="product-price">${product.price}</p>
+            <p className="product-description">{product.description}</p>
 
-        <div className="filters">
-          <form onSubmit={handleSearch} className="search-form">
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="form-control search-input"
-            />
-            <button type="submit" className="btn btn-primary">Search</button>
-          </form>
-
-          <select
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-              setPage(1);
-            }}
-            className="form-control category-select"
-          >
-            <option value="">All Categories</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {loading ? (
-          <div className="spinner"></div>
-        ) : (
-          <>
-            <div className="products-grid grid grid-3">
-              {products.map((product) => (
-                <Link
-                  key={product._id}
-                  to={`/products/${product._id}`}
-                  className="product-card card"
-                >
-                  <div className="product-image">
-                    <img
-                      src={product.image ? `${API_URL}${product.image}` : 'https://via.placeholder.com/300'}
-                      alt={product.name}
-                    />
-                  </div>
-                  <div className="product-info">
-                    <h3 className="product-name">{product.name}</h3>
-                    <p className="product-description">{product.description.substring(0, 100)}...</p>
-                    <p className="product-category">{product.category}</p>
-                    <div className="product-footer">
-                      <span className="product-price">${product.price}</span>
-                      {product.stock > 0 ? (
-                        <span className="product-stock">In Stock</span>
-                      ) : (
-                        <span className="product-stock out">Out of Stock</span>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {products.length === 0 && (
-              <p className="text-center no-products">No products found</p>
-            )}
-
-            {totalPages > 1 && (
-              <div className="pagination">
-                <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="btn btn-outline"
-                >
-                  Previous
-                </button>
-                <span className="page-info">
-                  Page {page} of {totalPages}
-                </span>
-                <button
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                  className="btn btn-outline"
-                >
-                  Next
-                </button>
+            {/* Quantity selector (no max stock) */}
+            <div className="product-actions">
+              <div className="quantity-selector">
+                <label>Quantity:</label>
+                <div className="quantity-controls">
+                  <button
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                    className="btn-quantity"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                    min="1"
+                    className="quantity-input"
+                  />
+                  <button
+                    onClick={() => setQuantity(q => q + 1)}
+                    className="btn-quantity"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-            )}
-          </>
-        )}
+              <button onClick={addToCart} className="btn btn-primary btn-add-cart">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default Products;
-// import React, { useState, useEffect } from 'react';
-// import { Link } from 'react-router-dom';
-// import axios from 'axios';
-// import './Products.css';
-
-// const API_URL = "https://mern-ecommerce-project-s9gg.onrender.com/api";
-
-// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
-// const Products = () => {
-//   const [products, setProducts] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [search, setSearch] = useState('');
-//   const [category, setCategory] = useState('');
-//   const [page, setPage] = useState(1);
-//   const [totalPages, setTotalPages] = useState(1);
-//   const [categories, setCategories] = useState([]);
-
-//   useEffect(() => {
-//     fetchProducts();
-//     fetchCategories();
-//   }, [search, category, page]);
-
-//   const fetchProducts = async () => {
-//     setLoading(true);
-//     try {
-//       const params = {
-//         page,
-//         limit: 12,
-//         ...(search && { search }),
-//         ...(category && { category })
-//       };
-//       const response = await axios.get(`${API_URL}/products`, { params });
-//       setProducts(response.data.products);
-//       setTotalPages(response.data.pages);
-//     } catch (error) {
-//       console.error('Error fetching products:', error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const fetchCategories = async () => {
-//     try {
-//       const response = await axios.get(`${API_URL}/products`);
-//       const allProducts = response.data.products;
-//       const uniqueCategories = [...new Set(allProducts.map(p => p.category))];
-//       setCategories(uniqueCategories);
-//     } catch (error) {
-//       console.error('Error fetching categories:', error);
-//     }
-//   };
-
-//   const handleSearch = (e) => {
-//     e.preventDefault();
-//     setPage(1);
-//     fetchProducts();
-//   };
-
-//   return (
-//     <div className="products-page">
-//       <div className="container">
-//         <h1 className="page-title">Products</h1>
-
-//         <div className="filters">
-//           <form onSubmit={handleSearch} className="search-form">
-//             <input
-//               type="text"
-//               placeholder="Search products..."
-//               value={search}
-//               onChange={(e) => setSearch(e.target.value)}
-//               className="form-control search-input"
-//             />
-//             <button type="submit" className="btn btn-primary">Search</button>
-//           </form>
-
-//           <select
-//             value={category}
-//             onChange={(e) => {
-//               setCategory(e.target.value);
-//               setPage(1);
-//             }}
-//             className="form-control category-select"
-//           >
-//             <option value="">All Categories</option>
-//             {categories.map((cat) => (
-//               <option key={cat} value={cat}>
-//                 {cat.charAt(0).toUpperCase() + cat.slice(1)}
-//               </option>
-//             ))}
-//           </select>
-//         </div>
-
-//         {loading ? (
-//           <div className="spinner"></div>
-//         ) : (
-//           <>
-//             <div className="products-grid grid grid-3">
-//               {products.map((product) => (
-//                 <Link
-//                   key={product._id}
-//                   to={`/products/${product._id}`}
-//                   className="product-card card"
-//                 >
-//                   <div className="product-image">
-//                     <img 
-//   src={product.image ? `https://mern-ecommerce-project-s9gg.onrender.com${product.image}` : 'https://via.placeholder.com/300'} 
-//   alt={product.name} 
-// />
-
-//                     {/* <img src={product.image || 'https://via.placeholder.com/300'} alt={product.name} /> */}
-//                   </div>
-//                   <div className="product-info">
-//                     <h3 className="product-name">{product.name}</h3>
-//                     <p className="product-description">{product.description.substring(0, 100)}...</p>
-//                     <p className="product-category">{product.category}</p>
-//                     <div className="product-footer">
-//                       <span className="product-price">${product.price}</span>
-//                       {product.stock > 0 ? (
-//                         <span className="product-stock">In Stock</span>
-//                       ) : (
-//                         <span className="product-stock out">Out of Stock</span>
-//                       )}
-//                     </div>
-//                   </div>
-//                 </Link>
-//               ))}
-//             </div>
-
-//             {products.length === 0 && (
-//               <p className="text-center no-products">No products found</p>
-//             )}
-
-//             {totalPages > 1 && (
-//               <div className="pagination">
-//                 <button
-//                   onClick={() => setPage(p => Math.max(1, p - 1))}
-//                   disabled={page === 1}
-//                   className="btn btn-outline"
-//                 >
-//                   Previous
-//                 </button>
-//                 <span className="page-info">
-//                   Page {page} of {totalPages}
-//                 </span>
-//                 <button
-//                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-//                   disabled={page === totalPages}
-//                   className="btn btn-outline"
-//                 >
-//                   Next
-//                 </button>
-//               </div>
-//             )}
-//           </>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Products;
-
-
+export default ProductDetail;

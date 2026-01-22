@@ -46,6 +46,7 @@ const ProductDetail = () => {
       });
       // Refresh cart count in navbar
       window.dispatchEvent(new Event('cartUpdated'));
+      toast.success('Added to cart successfully!');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add to cart');
     }
@@ -87,48 +88,42 @@ const ProductDetail = () => {
             )}
 
             <div className="product-stock-info">
-              {product.stock > 0 ? (
-                <span className="stock-available">✓ In Stock ({product.stock} available)</span>
-              ) : (
-                <span className="stock-unavailable">✗ Out of Stock</span>
-              )}
+              <span className="stock-available">✓ Available for Purchase</span>
             </div>
 
-            {product.stock > 0 && (
-              <div className="product-actions">
-                <div className="quantity-selector">
-                  <label>Quantity:</label>
-                  <div className="quantity-controls">
-                    <button
-                      onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                      className="btn-quantity"
-                    >
-                      -
-                    </button>
-                    <input
-                      type="number"
-                      value={quantity}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value) || 1;
-                        setQuantity(Math.min(product.stock, Math.max(1, val)));
-                      }}
-                      min="1"
-                      max={product.stock}
-                      className="quantity-input"
-                    />
-                    <button
-                      onClick={() => setQuantity(q => Math.min(product.stock, q + 1))}
-                      className="btn-quantity"
-                    >
-                      +
-                    </button>
-                  </div>
+            <div className="product-actions">
+              <div className="quantity-selector">
+                <label>Quantity (1-10):</label>
+                <div className="quantity-controls">
+                  <button
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                    className="btn-quantity"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value) || 1;
+                      setQuantity(Math.min(10, Math.max(1, val)));
+                    }}
+                    min="1"
+                    max="10"
+                    className="quantity-input"
+                  />
+                  <button
+                    onClick={() => setQuantity(q => Math.min(10, q + 1))}
+                    className="btn-quantity"
+                  >
+                    +
+                  </button>
                 </div>
-                <button onClick={addToCart} className="btn btn-primary btn-add-cart">
-                  Add to Cart
-                </button>
               </div>
-            )}
+              <button onClick={addToCart} className="btn btn-primary btn-add-cart">
+                Add to Cart
+              </button>
+            </div>
           </div>
         </div>
       </div>

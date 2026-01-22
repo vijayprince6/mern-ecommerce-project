@@ -58,11 +58,57 @@
 }
 
 @media (max-width: 768px) {
+  .hero {
+    padding: 30px 15px;
+  }
+
   .hero-content h1 {
-    font-size: 32px;
+    font-size: 24px;
+  }
+
+  .intro-section {
+    padding: 40px 0;
   }
 
   .intro-grid {
     grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 30px;
+  }
+
+  .intro-image {
+    height: 250px;
+  }
+
+  .intro-card h2 {
+    font-size: 24px;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 20px 10px;
+  }
+
+  .hero-content h1 {
+    font-size: 20px;
+  }
+
+  .intro-section {
+    padding: 30px 0;
+  }
+
+  .intro-grid {
+    gap: 20px;
+    padding: 0 10px;
+  }
+
+  .intro-image {
+    height: 200px;
+  }
+
+  .intro-card h2 {
+    font-size: 20px;
   }
 }
