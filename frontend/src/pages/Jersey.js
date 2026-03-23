@@ -51,7 +51,6 @@ const Jersey = () => {
       });
       // Refresh cart count in navbar
       refreshCartCount();
-      toast.success('Added to cart successfully!');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add to cart');
     }
@@ -89,12 +88,7 @@ const Jersey = () => {
       
       // Refresh cart count in navbar
       refreshCartCount();
-      toast.success('Added to cart! Redirecting to cart...');
-      
-      // Navigate to cart after a short delay
-      setTimeout(() => {
-        navigate('/cart');
-      }, 500);
+      navigate('/cart');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add to cart');
     }

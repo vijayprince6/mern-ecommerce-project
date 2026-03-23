@@ -84,7 +84,9 @@ const Orders = () => {
                       </p>
                     </div>
                     <div className="order-status">
-                      <span className="status-badge">Completed</span>
+                      <span className={`status-badge ${order.paymentStatus || 'pending'}`}>
+                        {order.paymentStatus === 'completed' ? 'Completed' : 'Pending'}
+                      </span>
                     </div>
                   </div>
                   
@@ -125,6 +127,17 @@ const Orders = () => {
                     <div className="order-summary">
                       <p><strong>Total Items:</strong> {order.totalQuantity || order.orderItems.reduce((sum, item) => sum + (item.quantity || 1), 0)}</p>
                       <p><strong>Payment Method:</strong> {order.paymentMethod || 'COD'}</p>
+                      {order.paymentMethod === 'UPI' && order.upiTransactionId && (
+                        <p><strong>UPI Transaction ID:</strong> {order.upiTransactionId}</p>
+                      )}
+                      {order.paymentMethod === 'Cash' && order.cashAmount && (
+                        <p><strong>Cash Paid:</strong> ₹{order.cashAmount.toFixed(2)}</p>
+                      )}
+                      <p><strong>Payment Status:</strong> 
+                        <span className={`payment-status ${order.paymentStatus || 'pending'}`}>
+                          {order.paymentStatus === 'completed' ? 'Completed' : 'Pending'}
+                        </span>
+                      </p>
                     </div>
                     <div className="order-total">
                       <strong>Total Amount: ₹{order.totalPrice?.toFixed(2) || '0.00'}</strong>

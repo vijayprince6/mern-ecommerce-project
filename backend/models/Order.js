@@ -19,6 +19,9 @@ const orderSchema = new mongoose.Schema({
     country: String
   },
   paymentMethod: { type: String, default: 'COD' },
+  paymentStatus: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
+  upiTransactionId: { type: String },
+  cashAmount: { type: Number, default: 0 },
   totalPrice: { type: Number, required: true, default: 0 },
   totalQuantity: { type: Number, default: 0 }, // Total number of items
 }, { timestamps: true });

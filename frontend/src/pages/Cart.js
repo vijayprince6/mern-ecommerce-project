@@ -51,7 +51,6 @@ const Cart = () => {
       await axios.delete(`${API_URL}/cart/item/${itemId}`);
       await fetchCart();
       window.dispatchEvent(new Event('cartUpdated'));
-      toast.success('Item removed from cart');
     } catch (error) {
       toast.error('Failed to remove item');
     }
@@ -77,18 +76,22 @@ const Cart = () => {
         image: item.product?.image || item.image
       }));
 
-      await axios.post(`${API_URL}/orders`, {
+      // Create order first
+      const orderResponse = await axios.post(`${API_URL}/orders`, {
         orderItems
       });
+
+      // Clear cart after order creation
       await axios.delete(`${API_URL}/cart`);
       window.dispatchEvent(new Event('cartUpdated'));
-      toast.success('Purchase successful! Your order has been placed.');
-      setCart([]);
-      setTimeout(() => {
-        navigate('/orders');
-      }, 1500);
+      navigate('/payment', { 
+        state: { 
+          order: orderResponse.data,
+          orderItems 
+        } 
+      });
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Purchase failed');
+      toast.error(error.response?.data?.message || 'Failed to initiate purchase');
     }
   };
 

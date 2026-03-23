@@ -1,6 +1,7 @@
 // backend/routes/orders.js
 import express from 'express';
 import Order from '../models/Order.js';
+import User from '../models/User.js';
 import { auth } from '../middleware/auth.js'; // ✅ named import
 
 const router = express.Router();
@@ -36,6 +37,14 @@ router.post('/', auth, async (req, res) => {
 
     // Populate product details for response
     await order.populate('orderItems.product');
+
+    // Update user statistics
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: {
+        totalOrders: 1,
+        totalAmountSpent: totalPrice
+      }
+    });
 
     res.status(201).json(order);
   } catch (error) {

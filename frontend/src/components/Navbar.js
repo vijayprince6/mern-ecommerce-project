@@ -131,7 +131,11 @@ const Navbar = () => {
               <span className="navbar-greeting">Hi {user?.name}</span>
               <Link to="/cart" className="navbar-link cart-link" onClick={() => setMenuOpen(false)}>
                 Cart
-                {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+                {cartCount > 0 && (
+                  <span className="cart-badge">
+                    {cartCount} {cartCount === 1 ? 'item' : 'items'}
+                  </span>
+                )}
               </Link>
               <button className="navbar-link btn-logout" onClick={handleLogout}>
                 Logout

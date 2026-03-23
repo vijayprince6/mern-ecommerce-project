@@ -29,8 +29,12 @@ const Login = () => {
     if (result.success) {
       toast.success('Login successful!');
       navigate('/');
+    } else if (result.message === 'User already exists') {
+      toast.error('You already have an account! Please login instead.');
+    } else if (result.message === 'Invalid credentials') {
+      toast.error('Invalid email or password. Please try again.');
     } else {
-      toast.error(result.message);
+      toast.error(result.message || 'Login failed. Please try again.');
     }
     
     setLoading(false);

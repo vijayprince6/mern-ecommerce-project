@@ -42,8 +42,10 @@ const Register = () => {
     if (result.success) {
       toast.success('Registration successful!');
       navigate('/');
+    } else if (result.message === 'User already exists') {
+      toast.error('You already have an account! Please login instead.');
     } else {
-      toast.error(result.message);
+      toast.error(result.message || 'Registration failed. Please try again.');
     }
     
     setLoading(false);

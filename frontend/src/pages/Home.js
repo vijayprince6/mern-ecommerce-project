@@ -7,12 +7,19 @@ const Home = () => {
     <div className="home">
       <section className="hero">
         <div className="hero-content">
-          <h1>Welcome to Sports Land</h1>
+          <h1>🏏 Premium SPORTS LAND</h1>
+          <p>Professional sports equipment at unbeatable prices</p>
+          <div className="hero-buttons">
+            <Link to="/bats" className="hero-btn">Shop Bats</Link>
+            <Link to="/balls" className="hero-btn">Shop Balls</Link>
+            <Link to="/jersey" className="hero-btn">Shop Jerseys</Link>
+          </div>
         </div>
       </section>
 
       <section className="intro-section">
         <div className="container">
+          <h2>Shop by Category</h2>
           <div className="intro-grid">
             <Link to="/bats" className="intro-card">
               <img
@@ -23,7 +30,7 @@ const Home = () => {
                   e.target.src = 'https://via.placeholder.com/400x300';
                 }}
               />
-              <h2>Bats</h2>
+              <h2>🏏 Bats</h2>
             </Link>
             <Link to="/balls" className="intro-card">
               <img
@@ -34,7 +41,7 @@ const Home = () => {
                   e.target.src = 'https://via.placeholder.com/400x300';
                 }}
               />
-              <h2>Balls</h2>
+              <h2>⚪ Balls</h2>
             </Link>
             <Link to="/jersey" className="intro-card">
               <img
@@ -45,7 +52,7 @@ const Home = () => {
                   e.target.src = 'https://via.placeholder.com/400x300';
                 }}
               />
-              <h2>Jerseys</h2>
+              <h2>👕 Jerseys</h2>
             </Link>
           </div>
         </div>
