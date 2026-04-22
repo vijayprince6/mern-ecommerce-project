@@ -56,44 +56,6 @@ const Jersey = () => {
     }
   };
 
-  const handleBuy = async (product) => {
-    if (!isAuthenticated) {
-      if (window.confirm('Please Login/Sign up first. Click OK to go to login page.')) {
-        navigate('/login');
-      }
-      return;
-    }
-
-    try {
-      const productData = {
-        name: product.name,
-        description: `${product.name} by ${product.company}`,
-        price: product.price,
-        category: 'jersey',
-        brand: product.company,
-        image: product.img
-      };
-
-      let productId = product._id;
-      if (!productId) {
-        const createResponse = await axios.post(`${API_URL}/products`, productData);
-        productId = createResponse.data._id;
-      }
-
-      // Add to cart (no stock checks - users can buy unlimited times)
-      await axios.post(`${API_URL}/cart`, {
-        productId,
-        quantity: 1
-      });
-      
-      // Refresh cart count in navbar
-      refreshCartCount();
-      navigate('/cart');
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to add to cart');
-    }
-  };
-
   return (
     <div className="jersey-page">
       <div className="container">
@@ -104,7 +66,6 @@ const Jersey = () => {
               key={jersey.id}
               product={jersey}
               onAddToCart={() => handleAddToCart(jersey)}
-              onBuy={() => handleBuy(jersey)}
               onImageClick={() => setSelectedImage(jersey.img)}
             />
           ))}

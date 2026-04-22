@@ -59,47 +59,6 @@ const Balls = () => {
     }
   };
 
-  const handleBuy = async (product) => {
-    if (!isAuthenticated) {
-      if (window.confirm('Please Login/Sign up first. Click OK to go to login page.')) {
-        navigate('/login');
-      }
-      return;
-    }
-
-    try {
-      // First, check if product exists in database or create it
-      const productData = {
-        name: product.name,
-        description: `${product.name} by ${product.company}`,
-        price: product.price,
-        category: 'balls',
-        brand: product.company,
-        image: product.img
-      };
-
-      // Try to find existing product or create new one
-      let productId = product._id;
-      if (!productId) {
-        // Create product in database
-        const createResponse = await axios.post(`${API_URL}/products`, productData);
-        productId = createResponse.data._id;
-      }
-
-      // Add to cart (no stock checks - users can buy unlimited times)
-      await axios.post(`${API_URL}/cart`, {
-        productId,
-        quantity: 1
-      });
-      
-      // Refresh cart count in navbar
-      refreshCartCount();
-      navigate('/cart');
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to add to cart');
-    }
-  };
-
   return (
     <div className="balls-page">
       <div className="container">
@@ -110,7 +69,6 @@ const Balls = () => {
               key={ball.id}
               product={ball}
               onAddToCart={() => handleAddToCart(ball)}
-              onBuy={() => handleBuy(ball)}
               onImageClick={() => setSelectedImage(ball.img)}
             />
           ))}

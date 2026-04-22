@@ -1,0 +1,276 @@
+.register-page {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.register-container {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.register-header h1 {
+  color: #333;
+  font-size: 28px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.register-header p {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+.register-footer p {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.register-footer a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-footer a:hover {
+  text-decoration: underline;
+}
+
+.password-requirements {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+  line-height: 1.4;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .register-page {
+    padding: 15px;
+  }
+
+  .register-container {
+    padding: 30px 25px;
+    max-width: 350px;
+  }
+
+  .register-header h1 {
+    font-size: 24px;
+  }
+
+  .register-header p {
+    font-size: 14px;
+  }
+
+  .form-control {
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+
+  .btn {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .password-requirements {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 600px) {
+  .register-page {
+    padding: 12px;
+  }
+
+  .register-container {
+    padding: 25px 20px;
+    max-width: 320px;
+  }
+
+  .register-header h1 {
+    font-size: 22px;
+  }
+
+  .register-header p {
+    font-size: 13px;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+  }
+
+  .form-control {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .btn {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .register-footer p {
+    font-size: 13px;
+  }
+
+  .password-requirements {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-page {
+    padding: 10px;
+  }
+
+  .register-container {
+    padding: 20px 15px;
+    max-width: 300px;
+  }
+
+  .register-header h1 {
+    font-size: 20px;
+  }
+
+  .register-header p {
+    font-size: 12px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .form-control {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .btn {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .register-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+  }
+
+  .register-footer p {
+    font-size: 12px;
+  }
+
+  .password-requirements {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 360px) {
+  .register-container {
+    padding: 15px 12px;
+    max-width: 280px;
+  }
+
+  .register-header h1 {
+    font-size: 18px;
+  }
+
+  .form-control {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .btn {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .password-requirements {
+    font-size: 8px;
+  }
+}

@@ -25,6 +25,7 @@
   align-items: center;
   gap: 5px;
   position: relative;
+  flex-shrink: 0;
 }
 
 .navbar-logo {
@@ -86,6 +87,7 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  flex-shrink: 0;
 }
 
 .navbar-link {
@@ -159,6 +161,7 @@
   background: none;
   border: none;
   cursor: pointer;
+  padding: 5px;
 }
 
 .navbar-toggle span {
@@ -168,6 +171,26 @@
   transition: all 0.3s ease;
 }
 
+/* Tablet Responsive */
+@media (max-width: 1024px) {
+  .navbar-container {
+    padding: 0 15px;
+  }
+  
+  .navbar-search {
+    max-width: 250px;
+  }
+  
+  .navbar-menu {
+    gap: 10px;
+  }
+  
+  .navbar-link {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+}
+
 @media (max-width: 968px) {
   .navbar-center {
     display: none;
@@ -175,21 +198,6 @@
 
   .navbar-search {
     max-width: 200px;
-  }
-}
-
-@media (max-width: 768px) {
-  .navbar {
-    height: 60px;
-  }
-
-  .navbar-container {
-    padding: 0 15px;
-    gap: 10px;
-  }
-
-  .logo-image {
-    height: 40px;
   }
 
   .navbar-toggle {
@@ -223,15 +231,32 @@
   .navbar-link {
     width: 100%;
     text-align: center;
-    padding: 12px;
+    padding: 15px;
     border-bottom: 1px solid #eee;
+    font-size: 16px;
   }
 
   .navbar-greeting {
     width: 100%;
     text-align: center;
-    padding: 12px;
+    padding: 15px;
     border-bottom: 1px solid #eee;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    height: 60px;
+  }
+
+  .navbar-container {
+    padding: 0 15px;
+    gap: 10px;
+  }
+
+  .logo-image {
+    height: 40px;
   }
 }
 
@@ -251,5 +276,39 @@
   .navbar-menu {
     top: 55px;
     padding: 15px;
+  }
+
+  .navbar-link {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .navbar-greeting {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .cart-badge {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 360px) {
+  .navbar-container {
+    padding: 0 8px;
+  }
+
+  .logo-image {
+    height: 30px;
+  }
+
+  .navbar {
+    height: 50px;
+  }
+
+  .navbar-menu {
+    top: 50px;
   }
 }
