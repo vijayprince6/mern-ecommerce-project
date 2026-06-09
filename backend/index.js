@@ -17,7 +17,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(cors());
+
+// CORS configuration - Allow frontend domain
+const corsOptions = {
+  origin: [
+    'https://mern-ecommerce-project-1-qdkl.onrender.com', // Your frontend URL
+    'http://localhost:3000', // Local development
+    'http://localhost:5000'  // Local backend testing
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // API Routes
