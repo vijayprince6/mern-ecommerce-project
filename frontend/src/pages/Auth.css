@@ -43,4 +43,40 @@
   text-decoration: underline;
 }
 
+/* ✅ Inline error message — shows inside the form, center of page */
+.auth-error {
+  background-color: #fff0f0;
+  border: 1.5px solid #e74c3c;
+  border-radius: 8px;
+  color: #c0392b;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  text-align: center;
+  animation: shakeError 0.3s ease;
+}
+
+/* ✅ Inline info/redirect message */
+.auth-info {
+  background-color: #fff8e1;
+  border: 1.5px solid #f39c12;
+  border-radius: 8px;
+  color: #856404;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+@keyframes shakeError {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-6px); }
+  50%  { transform: translateX(6px); }
+  75%  { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+
+
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { toast } from 'react-toastify';
+
 import axios from 'axios';
 import ImageModal from './ImageModal';
 import './Navbar.css';
@@ -12,7 +12,7 @@ const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+
   const [cartCount, setCartCount] = useState(0);
   const [showLogoModal, setShowLogoModal] = useState(false);
 
@@ -52,26 +52,12 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    toast.success('You logout successfully');
     navigate('/');
     setMenuOpen(false);
     setCartCount(0);
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const term = searchTerm.toLowerCase().trim();
-    if (term === 'balls' || term === 'ball') {
-      navigate('/balls');
-    } else if (term === 'bats' || term === 'bat') {
-      navigate('/bats');
-    } else if (term === 'jersey' || term === 'jerseys') {
-      navigate('/jersey');
-    } else {
-      toast.info('Please search for: balls, bats, or jersey');
-    }
-    setSearchTerm('');
-  };
+
 
   return (
     <nav className="navbar">
@@ -112,17 +98,7 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="navbar-search">
-          <input
-            type="text"
-            placeholder="search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-          <button type="submit" className="search-btn">🔍</button>
-        </form>
+
 
         {/* Right side menu */}
         <div className={`navbar-menu ${menuOpen ? 'active' : ''}`}>
@@ -133,7 +109,7 @@ const Navbar = () => {
                 Cart
                 {cartCount > 0 && (
                   <span className="cart-badge">
-                    {cartCount} {cartCount === 1 ? 'item' : 'items'}
+                    {cartCount}
                   </span>
                 )}
               </Link>

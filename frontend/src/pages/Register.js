@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
@@ -12,10 +12,21 @@ const Register = () => {
     confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const [errorMsg, setErrorMsg] = useState('');
+  const [infoMsg, setInfoMsg] = useState('');
+  const { register, isAuthenticated, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
+  // If already logged in, redirect to Home
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, authLoading, navigate]);
+
   const handleChange = (e) => {
+    setErrorMsg(''); // clear error when user types
+    setInfoMsg('');
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -24,30 +35,36 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
+    setInfoMsg('');
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
+      setErrorMsg('Passwords do not match. Please check again.');
       return;
     }
 
     if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+      setErrorMsg('Password must be at least 6 characters.');
       return;
     }
 
     setLoading(true);
 
     const result = await register(formData.name, formData.email, formData.password);
-    
+
     if (result.success) {
-      toast.success('Registration successful!');
+      toast.success('Registration successful! You are now logged in.');
       navigate('/');
     } else if (result.message === 'User already exists') {
-      toast.error('You already have an account! Please login instead.');
+      // ✅ Email already in MongoDB — show info and redirect to login
+      setInfoMsg('You already have an account with this email! Redirecting you to Login...');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2500);
     } else {
-      toast.error(result.message || 'Registration failed. Please try again.');
+      setErrorMsg(result.message || 'Registration failed. Please try again.');
     }
-    
+
     setLoading(false);
   };
 
@@ -56,6 +73,12 @@ const Register = () => {
       <div className="auth-container">
         <div className="auth-card card">
           <h2>Register</h2>
+          {errorMsg && (
+            <div className="auth-error">{errorMsg}</div>
+          )}
+          {infoMsg && (
+            <div className="auth-info">{infoMsg}</div>
+          )}
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Name</label>

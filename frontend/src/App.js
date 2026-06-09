@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -18,31 +18,50 @@ import Orders from './pages/Orders';
 import Payment from './pages/Payment';
 import DeliveryDetails from './pages/DeliveryDetails';
 
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import './App.css';
+
+// ✅ ProtectedRoute: checks MongoDB Atlas auth state
+// - If still loading (verifying token with DB) → show nothing
+// - If NOT logged in (new user / no token) → redirect to /register
+// - If logged in (old user, token verified) → show the page
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return null; // Wait while token is being verified with MongoDB
+
+  if (!isAuthenticated) {
+    return <Navigate to="/register" replace />;
+  }
+
+  return children;
+};
 
 function App() {
   return (
     <AuthProvider>
-      <Router> {/* ✅ Only one Router here */}
+      <Router>
         <div className="App">
           <Navbar />
 
           <main className="main-content">
             <Routes>
+              {/* Public routes — anyone can visit */}
               <Route path="/" element={<Home />} />
               <Route path="/products" element={<Products />} />
               <Route path="/products/:id" element={<ProductDetail />} />
               <Route path="/balls" element={<Balls />} />
               <Route path="/bats" element={<Bats />} />
               <Route path="/jersey" element={<Jersey />} />
-              <Route path="/cart" element={<Cart />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/payment" element={<Payment />} />
-              <Route path="/delivery-details" element={<DeliveryDetails />} />
+
+              {/* 🔒 Protected routes — only logged-in users */}
+              <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+              <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+              <Route path="/delivery-details" element={<ProtectedRoute><DeliveryDetails /></ProtectedRoute>} />
             </Routes>
           </main>
 
