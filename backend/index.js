@@ -18,13 +18,25 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// CORS configuration - Allow frontend domain
+// CORS configuration - Allow requests from multiple origins
 const corsOptions = {
-  origin: [
-    'https://mern-ecommerce-project-1-qdkl.onrender.com', // Your frontend URL
-    'http://localhost:3000', // Local development
-    'http://localhost:5000'  // Local backend testing
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'https://mern-ecommerce-project-1-qdkl.onrender.com', // Frontend Static Site
+      'https://mern-ecommerce-project-s9gg.onrender.com',   // Backend itself
+      'http://localhost:3000', // Local development
+      'http://localhost:5000'  // Local backend
+    ];
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };
