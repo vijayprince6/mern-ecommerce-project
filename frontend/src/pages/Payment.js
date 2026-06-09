@@ -14,9 +14,7 @@ const Payment = () => {
   const location = useLocation();
   const { order, orderItems } = location.state || {};
 
-  const [qrCode, setQrCode] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
-  const [transactionId, setTransactionId] = useState('');
   const [cashAmount, setCashAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [qrLoading, setQrLoading] = useState(false);
@@ -164,7 +162,6 @@ const Payment = () => {
                 className={`payment-option ${paymentMethod === 'UPI' ? 'active' : ''}`}
                 onClick={() => {
                   setPaymentMethod('UPI');
-                  setQrCode('');
                 }}
               >
                 <div className="payment-icon">📱</div>
@@ -178,7 +175,6 @@ const Payment = () => {
                 className={`payment-option ${paymentMethod === 'Cash' ? 'active' : ''}`}
                 onClick={() => {
                   setPaymentMethod('Cash');
-                  setQrCode('');
                 }}
               >
                 <div className="payment-icon">💵</div>

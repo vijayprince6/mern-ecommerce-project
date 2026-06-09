@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 import { useAuth } from '../context/AuthContext';
 import './Auth.css';
@@ -10,7 +11,6 @@ const Login = () => {
     password: ''
   });
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(''); // ✅ inline error state
   const { login, isAuthenticated, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -22,7 +22,6 @@ const Login = () => {
   }, [isAuthenticated, authLoading, navigate]);
 
   const handleChange = (e) => {
-    setErrorMsg(''); // clear error when user starts typing
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -31,15 +30,25 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMsg('');
     setLoading(true);
 
     const result = await login(formData.email, formData.password);
 
     if (result.success) {
+      toast.success('Login successful! Welcome back 👋');
       navigate('/');
     } else {
-      setErrorMsg(result.message || 'Login failed. Please try again.');
+      const msg = result.message || 'Login failed. Please try again.';
+
+      if (msg.includes('not registered') || msg.includes('not found')) {
+        toast.error('❌ No account found! Please register first.');
+      } else if (msg.includes('password') || msg.includes('Invalid')) {
+        toast.error('❌ Wrong password. Please try again.');
+      } else if (msg.includes('Server error') || msg.includes('server')) {
+        toast.error('⚠️ Server error. Please try again in a moment.');
+      } else {
+        toast.error(`❌ ${msg}`);
+      }
     }
 
     setLoading(false);
@@ -50,9 +59,6 @@ const Login = () => {
       <div className="auth-container">
         <div className="auth-card card">
           <h2>Login</h2>
-          {errorMsg && (
-            <div className="auth-error">{errorMsg}</div>
-          )}
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Email</label>
@@ -62,6 +68,7 @@ const Login = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className="form-control"
+                placeholder="Enter your email"
                 required
               />
             </div>
@@ -73,6 +80,7 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className="form-control"
+                placeholder="Enter your password"
                 required
               />
             </div>
@@ -94,5 +102,3 @@ const Login = () => {
 };
 
 export default Login;
-
-

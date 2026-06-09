@@ -32,7 +32,7 @@ const frontendBuildPath = path.join(__dirname, '../frontend/build');
 app.use(express.static(frontendBuildPath));
 
 // ✅ Catch-all: send index.html for any unknown route (fixes 404 on /login, /register, etc.)
-app.get('*', (req, res) => {
+app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(frontendBuildPath, 'index.html'));
 });
 

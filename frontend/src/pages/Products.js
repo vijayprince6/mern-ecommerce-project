@@ -15,10 +15,6 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
 
-  useEffect(() => {
-    fetchProduct();
-  }, [id]);
-
   const fetchProduct = async () => {
     try {
       const response = await axios.get(`${API_URL}/products/${id}`);
@@ -30,6 +26,11 @@ const ProductDetail = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchProduct();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const addToCart = async () => {
     if (!isAuthenticated) {
