@@ -1,14 +1,14 @@
 .bats-page {
   padding: 20px;
   min-height: calc(100vh - 70px);
-  background: #f1f3f6;
+  background: #000000;
 }
 
 .page-title {
   text-align: center;
   font-size: 32px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #ffffff;
   margin-bottom: 10px;
   text-transform: uppercase;
   letter-spacing: 1px;

@@ -35,7 +35,6 @@ const Login = () => {
     const result = await login(formData.email, formData.password);
 
     if (result.success) {
-      toast.success('Login successful! Welcome back 👋');
       navigate('/');
     } else {
       const msg = result.message || 'Login failed. Please try again.';
