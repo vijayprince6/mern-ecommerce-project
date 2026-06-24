@@ -47,7 +47,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(frontendBuild));
 
   // Catch-all: send index.html for any non-API route (fixes /cart, /jersey, /balls etc.)
-  app.get('*', (req, res) => {
+  app.get('/{*splat}', (req, res) => {
     res.sendFile(path.join(frontendBuild, 'index.html'));
   });
 } else {
