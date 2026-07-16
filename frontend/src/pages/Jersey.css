@@ -1,14 +1,17 @@
 .jersey-page {
   padding: 20px;
   min-height: calc(100vh - 70px);
-  background: #ffffff;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
 }
 
 .page-title {
   text-align: center;
   font-size: 36px;
   font-weight: 800;
-  color: #1e40af;
+  background: linear-gradient(90deg, #f97316, #ef4444, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 10px;
   text-transform: uppercase;
   letter-spacing: 2px;
